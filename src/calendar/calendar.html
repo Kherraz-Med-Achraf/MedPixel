@@ -225,7 +225,11 @@
         },
       });
       calendar.render();
-      loadEvents(); // Chargez les événements après avoir rendu le calendrier
+      // Chargez les événements après avoir rendu le calendrier
+
+      setTimeout(() => {
+        loadEvents(calendar);
+      }, 300);
     });
 
     function addEvent() {
@@ -294,38 +298,61 @@
       const typeBtn = document.getElementById("type-btn");
 
       var playerRole = WA.player.tags;
-      var isUserAdmin = playerRole.includes("admin"); //admin
+      var isUserAdmin = playerRole.includes("afdsdminff"); //admin
       if (isUserAdmin) {
         typeBtn.textContent = "Supprimer";
         typeBtn.onclick = function () {
           deleteEvent(eventObj);
         }; // Assurez-vous que cette fonction est correctement définie pour supprimer l'événement
       } else {
-        typeBtn.textContent = "S'inscrire";
-        typeBtn.onclick = function () {
-          let tab = WA.player.state.role;
-          tab.push(eventObj.extendedProps.salle);
-          WA.player.state.role = tab;
-          WA.chat.sendChatMessage(
-            "Je suis inscrit à " +
-              eventObj.title +
-              " dans la salle: " +
-              eventObj.extendedProps.salle
-          );
-          console.log("player role", WA.player.state.role);
-
-          // Calculer le délai jusqu'à la fin de l'événement
-          let delay = getDelayUntilEventEnds(eventObj.end);
-          let delayInfo = {
-            delay: delay,
-            salle: eventObj.extendedProps.salle,
-            title: eventObj.title,
+        if (isUserRegistered(eventObj)) {
+          typeBtn.textContent = "Se désinscrire";
+          typeBtn.onclick = function () {
+            unregisterEvent(eventObj);
           };
-          WA.state.saveVariable("delayinfo", JSON.stringify(delayInfo));
-        };
+        } else {
+          typeBtn.textContent = "S'inscrire";
+          typeBtn.onclick = function () {
+            registerEvent(eventObj);
+          };
+        }
+        window.currentEvent = eventObj; // Stocker l'événement actuel pour l'utiliser dans les fonctions deleteEvent ou d'inscription
       }
+    }
 
-      window.currentEvent = eventObj; // Stocker l'événement actuel pour l'utiliser dans les fonctions deleteEvent ou d'inscription
+    function isUserRegistered(eventObj) {
+      return WA.player.state.role.includes(eventObj.extendedProps.salle);
+    }
+
+    function registerEvent(eventObj) {
+      WA.player.state.role.push(eventObj.extendedProps.salle);
+      WA.chat.sendChatMessage(
+        "Inscription à l'événement : " + eventObj.title,
+        "Info"
+      );
+      // Calculer le délai jusqu'à la fin de l'événement
+      let delay = getDelayUntilEventEnds(eventObj.end);
+      let delayInfo = {
+        delay: delay,
+        salle: eventObj.extendedProps.salle,
+        title: eventObj.title,
+      };
+      WA.state.saveVariable("delayinfo", JSON.stringify(delayInfo));
+      console.log("role in", WA.player.state.role);
+      closeModal();
+    }
+
+    function unregisterEvent(eventObj) {
+      const index = WA.player.state.role.indexOf(eventObj.extendedProps.salle);
+      if (index > -1) {
+        WA.player.state.role.splice(index, 1);
+        WA.chat.sendChatMessage(
+          "Désinscription de l'événement : " + eventObj.title,
+          "Info"
+        );
+        console.log("role outd", WA.player.state.role);
+        closeModal();
+      }
     }
 
     function deleteEvent(eventObj) {
@@ -387,27 +414,37 @@
 
     //loading data from the state
 
-    function loadEvents() {
-      var storedEvents = WA.state.loadVariable("toto");
-      var events = JSON.parse(storedEvents);
-      events.forEach((event) => {
-        calendar.addEvent({
-          title: event.title,
-          start: event.start,
-          end: event.end,
-          extendedProps: {
-            salle: event.extendedProps.salle,
-          },
-          color: event.color,
-        });
-      });
+    async function loadEvents(calendarActive) {
+      if (WA.state.hasVariable("toto")) {
+        var storedEvents = await WA.state.loadVariable("toto");
+
+        if (storedEvents) {
+          var events = JSON.parse(storedEvents);
+          events.forEach((event) => {
+            calendarActive.addEvent({
+              title: event.title,
+              start: event.start,
+              end: event.end,
+              extendedProps: {
+                salle: event.extendedProps.salle,
+              },
+              color: event.color,
+            });
+          });
+        } else {
+          console.log("Aucun événement à charger.");
+        }
+      } else {
+        console.log("La variable 'toto' n'est pas définie.");
+      }
     }
+
     function closeIfram() {
       WA.state.saveVariable("iframe", false);
     }
 
     WA.onInit().then(() => {
-      var playerRole = WA.player.tags;
+      var playerRole = WA.player.state.role;
       console.log("player role", playerRole);
     });
 
