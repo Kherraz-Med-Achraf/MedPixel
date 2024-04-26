@@ -27,6 +27,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 index: "./index.html",
+                calendar:"./src/calendar/calendar.html",
                 ...getMapsScripts(maps),
             },
         },

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calendrier de réservation</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/main.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/locales/fr.min.js"></script>
+    <script src="https://play.workadventu.re/iframe_api.js"></script>
+    
+
+    <style>
+      * {
+        box-sizing: border-box;
+        transition: all 0.3s ease;
+      }
+      body {
+        box-shadow: 0 0 20px rgba(0, 0, 0, 1);
+        border-radius: 25px;
+        width: 700px;
+        position: relative;
+      }
+      #calendar {
+        background-color: white;
+        border-radius: 25px;
+        padding: 20px;
+      }
+      .close-btn {
+        position: absolute;
+        right: -50px;
+        top: 10px;
+        background-color: red;
+        color: white;
+        height: 50px;
+        width: 50px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        border: 1px solid red;
+        border: none;
+        border-radius: 100%;
+        cursor: pointer;
+        font-size: 20px;
+      }
+      .close-btn:hover {
+        background-color: rgb(245, 92, 92);
+        transition: all 0.3s ease;
+      }
+      .fc-day:hover {
+        /* color of the hover */
+        background-color: #e3e3e3;
+        cursor: pointer;
+        transition: all 0.3s ease;
+      }
+      #eventInputForm {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        padding: 10px 20px;
+        background: #e7e7e7;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        z-index: 100;
+        max-width: 400px; /* ajustez la largeur selon vos besoins */
+        width: 100%;
+      }
+
+      #eventInputForm .top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      #eventInputForm .top button {
+        width: 100px;
+        background-color: red;
+        color: white;
+        padding: 7px 10px;
+      }
+
+      #eventInputForm .top button:hover {
+        background-color: rgb(245, 92, 92);
+        transition: all 0.3s ease;
+      }
+
+      #eventInputForm input,
+      #eventInputForm select {
+        width: 100%;
+        margin: 10px 0;
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      #eventInputForm button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: #007bff;
+        color: #fff;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+
+      #eventInputForm button:hover {
+        background: #0056b3;
+      }
+
+      #eventModal {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.4);
+        padding: 20px;
+        z-index: 100;
+      }
+
+      #eventModal div {
+        margin: 5px 0;
+      }
+
+      #eventModal button {
+        margin: 5px auto;
+        width: 100px;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        background-color: #007bff;
+        color: white;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      #eventModal button:hover {
+        background-color: #0056b3;
+      }
+
+      #eventModal button:last-child {
+        background-color: #dc3545;
+      }
+
+      #eventModal button:last-child:hover {
+        background-color: #c82333;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="calendar"></div>
+    <button class="close-btn" onclick="closeIfram()">X</button>
+    <!-- fenêtre pour l'ajout d'événement -->
+    <div id="eventInputForm" style="display: none">
+      <div class="top">
+        <h3>Réserver une Salle</h3>
+        <button onclick="closeForm()">Fermer</button>
+      </div>
+      <input type="text" id="eventName" placeholder="Nom de l'événement" />
+      <input type="datetime-local" id="eventStart" />
+      <input type="number" id="eventDuration" placeholder="Durée en heures" />
+      <select id="roomSelect">
+        <option value="salleA">Salle A</option>
+        <option value="salleB">Salle B</option>
+        <option value="salleC">Salle C</option>
+      </select>
+      <button onclick="addEvent()">Ajouter</button>
+    </div>
+    <!-- fenêtre pour afficher un événement -->
+    <div id="eventModal" style="display: none">
+      <div>Nom: <span id="modalTitle"></span></div>
+      <div>Heure: <span id="modalTime"></span></div>
+      <div>Salle: <span id="modalSalle"></span></div>
+      <button id="type-btn" onclick="deleteEvent()">Supprimer</button>
+      <button onclick="closeModal()">Fermer</button>
+    </div>
+    <script src="./calendar.js"></script>
+  </body>
+</html>
