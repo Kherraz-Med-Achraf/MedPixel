@@ -321,11 +321,14 @@
     }
 
     function isUserRegistered(eventObj) {
-      return WA.player.state.role.includes(eventObj.extendedProps.salle);
+      let tab = WA.player.state.role;
+      return tab.includes(eventObj.extendedProps.salle);
     }
 
     function registerEvent(eventObj) {
-      WA.player.state.role.push(eventObj.extendedProps.salle);
+      let tab = WA.player.state.role;
+      tab.push(eventObj.extendedProps.salle);
+      WA.player.state.role = tab;
       WA.chat.sendChatMessage(
         "Inscription à l'événement : " + eventObj.title,
         "Info"
@@ -343,9 +346,11 @@
     }
 
     function unregisterEvent(eventObj) {
-      const index = WA.player.state.role.indexOf(eventObj.extendedProps.salle);
+      let tab = WA.player.state.role;
+      const index = tab.indexOf(eventObj.extendedProps.salle);
       if (index > -1) {
-        WA.player.state.role.splice(index, 1);
+        tab.splice(index, 1);
+        WA.player.state.role = tab;
         WA.chat.sendChatMessage(
           "Désinscription de l'événement : " + eventObj.title,
           "Info"
