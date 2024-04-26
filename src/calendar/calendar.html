@@ -225,7 +225,6 @@ document.addEventListener("DOMContentLoaded", function () {
   });
   calendar.render();
   loadEvents(); // Chargez les événements après avoir rendu le calendrier
-  checkPlayer();
 });
 
 function addEvent() {
@@ -387,24 +386,25 @@ function saveEvents() {
 //loading data from the state
 
 function loadEvents() {
-  var storedEvents = WA.state.loadVariable("toto");
-
-  if (storedEvents) {
-    var events = JSON.parse(storedEvents);
-    events.forEach((event) => {
-      calendar.addEvent({
-        title: event.title,
-        start: event.start,
-        end: event.end,
-        extendedProps: {
-          salle: event.extendedProps.salle,
-        },
-        color: event.color, // Assurez-vous de restituer la couleur
+  WA.state.loadVariable("toto").then(storedEvents => {
+    if (storedEvents) {
+      var events = JSON.parse(storedEvents);
+      events.forEach(event => {
+        calendar.addEvent({
+          title: event.title,
+          start: event.start,
+          end: event.end,
+          extendedProps: {
+            salle: event.extendedProps.salle,
+          },
+          color: event.color,
+        });
       });
-    });
-  }
+    }
+  }).catch(error => {
+    console.error("Failed to load events:", error);
+  });
 }
-
 function closeIfram() {
   WA.state.saveVariable("iframe", false);
 }
