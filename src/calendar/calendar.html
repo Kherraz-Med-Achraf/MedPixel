@@ -179,7 +179,6 @@
     </div>
   </body>
   <script>
-    // @ts-nocheck
 var calendar;
 document.addEventListener("DOMContentLoaded", function () {
   var calendarEl = document.getElementById("calendar");
@@ -194,10 +193,13 @@ document.addEventListener("DOMContentLoaded", function () {
       list: "liste",
     },
     dateClick: function (info) {
+      if (WA.player.tags.includes("admin")) {
+        // Vérifiez si le joueur est un administrateur (ou un autre rôle si nécessaire
       var clickedDate = info.date;
       var formattedDate = formatDateAndTime(clickedDate);
       document.getElementById("eventStart").value = formattedDate;
       document.getElementById("eventInputForm").style.display = "block";
+      }
     },
     headerToolbar: {
       left: "prev,next today",
